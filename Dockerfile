@@ -19,12 +19,13 @@ RUN echo '[multilib]' >> /etc/pacman.conf && \
     pacman -Syu --noconfirm --needed && \
     pacman -S --noconfirm --needed base-devel && \
     curl -s https://blackarch.org/strap.sh | sed 's|  check_internet|  #check_internet|' | sh && \
+    pacman -S --noconfirm --needed \
+        gcc gdb git gnu-netcat grml-zsh-config vim lib32-gcc-libs p7zip peda python pwndbg \
+        pwntools radare2 rsync searchsploit tmux unrar unzip wget whois xsel xz zip zsh tar \
+        zsh-completions && \
+    echo 'source /usr/share/peda/peda.py' >> /root/.gdbinit && \
+    echo 'e asm.syntax = att' >> /root/radare2rc && \
+    echo 'e asm.cmtright = true' >> /root/radare2rc && \
     chsh -s /bin/zsh root
 
 CMD ["/bin/zsh"]
-
-# Installing packages would be
-#pacman -S --noconfirm --needed \
-#gcc gdb git gnu-netcat grml-zsh-config vim lib32-gcc-libs openssh p7zip peda python \
-#pwndbg pwntools radare2 rsync searchsploit tmux unrar unzip wget whois wireshark-cli xsel \
-#xz zip zsh zsh-completions tar && \
