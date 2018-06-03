@@ -25,7 +25,6 @@ RUN echo '[multilib]' >> /etc/pacman.conf && \
         zsh-completions && \
     echo 'source /usr/share/peda/peda.py' >> /root/.gdbinit && \
     echo 'e asm.syntax = att' >> /root/radare2rc && \
-    echo 'e asm.cmtright = true' >> /root/radare2rc && \
     chsh -s /bin/zsh root
 
 CMD ["/bin/zsh"]
