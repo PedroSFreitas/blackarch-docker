@@ -11,16 +11,17 @@
 set -eu
 
 # global package variable
-# hold the name of all the packages you want to install by default
-packages=('gcc' 'gdb' 'git' 'gnu-netcat' 'grml-zsh-config' 'vim' \
-          'lib32-gcc-libs' 'peda' 'python' 'pwndbg' 'pwntools' 'radare2' \
-          'searchsploit' 'tmux' 'unrar' 'unzip' 'wget' 'xz' 'zip' 'zsh' 'tar' \
-          'zsh-completions')
+# packages_base holds the base packages for the system (you shouldn't change it)
+# packages_security will hold the packages from blackarch to be installed.
+packages_base=('zsh' 'yaourt' 'zsh-completions' 'grml-zsh-config' 'vim')
+packages_security=('')
 
 # enable multilib repository
 set_pacman_conf() {
     echo '[multilib]' >> /etc/pacman.conf
     echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
+
+    rm -rfv /usr/share/libalpm/hooks/package-cleanup.hook
 
     return 0
 }
@@ -50,7 +51,7 @@ set_peda_conf() {
 
 # set radare2 configuration (at&t syntax)
 set_radare_conf() {
-    echo 'e asm.syntax = att' >> /root/radare2rc
+    echo 'e asm.syntax = att' >> /root/.radare2rc
 
     return 0
 }
@@ -58,7 +59,7 @@ set_radare_conf() {
 # upgrade system, install blackarch repo and base-devel
 pacman_update() {
     pacman -Syu --needed --noconfirm
-    pacman -S base base-devel --needed --overwrite
+    pacman -S base base-devel --needed --noconfirm
 
     curl -s https://blackarch.org/strap.sh | \
         sed 's|  check_internet|  #check_internet|' | sh
@@ -77,11 +78,20 @@ set_zsh() {
 
 # install packages named on $packages
 install_packages() {
-    if [[ -z "${packages[*]}" ]]; then
+    if [[ -z "${packages_base[*]}" ]]; then
+        echo "ERROR: packages_base array is empty!"
         return 1
     fi
 
-    pacman -Sy --needed "${packages[@]}"
+    echo "Installing base packages..."
+    pacman -Sy --needed --noconfirm "${packages_base[@]}"
+
+    if [[ -z "${packages_security[*]}" ]]; then
+        return 0
+    fi
+
+    echo "Installing security packages..."
+    pacman -Sy --needed --noconfirm "${packages_security[@]}"
 
     return 0
 }
