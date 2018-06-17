@@ -1,7 +1,7 @@
 FROM archlinux/base
-MAINTAINER psf
+LABEL maintainer="psf@blackarch.org"
 
-USER root
+USER root:root
 ENV HOME /root
 WORKDIR /root
 
